@@ -76,17 +76,5 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/jquery.spapp.min.js"></script>
     <script src="js/app.js"></script>
-
-    <script>
-      // year + dynamic dashboard link
-      document.getElementById('year').textContent = new Date().getFullYear();
-      const role = localStorage.getItem("userRole");
-      const navDash = document.getElementById("navDashboard");
-      if (navDash) {
-        if (role === "user") navDash.href = "#dashboard_user";
-        else if (role === "landlord") navDash.href = "#dashboard_landlord";
-        else navDash.href = "#login";
-      }
-    </script>
   </body>
 </html>

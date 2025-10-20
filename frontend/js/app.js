@@ -1,25 +1,24 @@
 // ===== DATA =====
 const LISTINGS = [
-  { id: 1, title: "Old Town Studio - Sarajevo", municipality: "Stari Grad", priceBAM: 50, rating: 4.8, beds: 1, baths: 1, size: 28, cover: "assets/listings/1a.jpg", gallery: ["assets/listings/1a.jpg","assets/listings/1a.jpg"], heating: "Central", amenities: ["Wi-Fi", "Heating", "Kitchen"], description: "Cozy studio in Baščaršija. Walk everywhere." },
-  { id: 2, title: "Riverside Loft - Mostar", municipality: "Mostar", priceBAM: 70, rating: 4.6, beds: 1, baths: 1, size: 36, cover: "assets/listings/cottage.jpg", gallery: ["assets/listings/cottage.jpg","assets/listings/cottage.jpg"], heating: "Electric", amenities: ["Wi-Fi", "AC", "Kitchen"], description: "Modern loft near the Neretva with lovely views." },
-  { id: 3, title: "Blagaj resort", municipality: "Blagaj", priceBAM: 160, rating: 4.9, beds: 3, baths: 2, size: 80, cover: "assets/listings/exoticpool.jpg", gallery: ["assets/listings/exoticpool.jpg","assets/listings/exoticpool.jpg"], heating: "Wood stove", amenities: ["Fireplace", "Parking", "Kitchen", "Pool"], description: "Warm wooden cabin close to ski slopes." },
-  { id: 4, title: "Sunny Two-Bedroom - Banja Luka", municipality: "Banja Luka", priceBAM: 95, rating: 4.5, beds: 2, baths: 1, size: 62, cover: "assets/listings/cozyroom.jpg", gallery: ["assets/listings/cozyroom.jpg","assets/listings/cozyroom.jpg"], heating: "Central", amenities: ["Wi-Fi", "Balcony", "Lift"], description: "Bright apartment near the center." },
-  { id: 5, title: "City Center Apartment - Tuzla", municipality: "Tuzla", priceBAM: 60, rating: 4.4, beds: 1, baths: 1, size: 35, cover: "assets/listings/oneroom.jpg", gallery: ["assets/listings/oneroom.jpg","assets/listings/oneroom.jpg"], heating: "Electric", amenities: ["Wi-Fi", "Washer", "Kitchen"], description: "Close to cafes and Salt Lakes." },
-  { id: 6, title: "Old Bridge View - Mostar", municipality: "Mostar", priceBAM: 110, rating: 4.7, beds: 2, baths: 1, size: 55, cover: "assets/listings/bohoroom.jpg", gallery: ["assets/listings/bohoroom.jpg","assets/listings/bohoroom.jpg"], heating: "Central", amenities: ["Wi-Fi", "AC", "Kitchen"], description: "Steps from Stari Most with a balcony." },
+  { id: 1, title: "Old Town Studio - Sarajevo", municipality: "Stari Grad", priceBAM: 50, beds: 1, baths: 1, size: 28, cover: "assets/listings/1a.jpg", gallery: ["assets/listings/1a.jpg","assets/listings/1a.jpg"], heating: "Central", amenities: ["Wi-Fi", "Heating", "Kitchen"], description: "Cozy studio in Baščaršija. Walk everywhere." },
+  { id: 2, title: "Riverside Loft - Mostar", municipality: "Mostar", priceBAM: 70, beds: 1, baths: 1, size: 36, cover: "assets/listings/cottage.jpg", gallery: ["assets/listings/cottage.jpg","assets/listings/cottage.jpg"], heating: "Electric", amenities: ["Wi-Fi", "AC", "Kitchen"], description: "Modern loft near the Neretva with lovely views." },
+  { id: 3, title: "Blagaj resort", municipality: "Blagaj", priceBAM: 160, beds: 3, baths: 2, size: 80, cover: "assets/listings/exoticpool.jpg", gallery: ["assets/listings/exoticpool.jpg","assets/listings/exoticpool.jpg"], heating: "Wood stove", amenities: ["Fireplace", "Parking", "Kitchen", "Pool"], description: "Warm wooden cabin close to ski slopes." },
+  { id: 4, title: "Sunny Two-Bedroom - Banja Luka", municipality: "Banja Luka", priceBAM: 95, beds: 2, baths: 1, size: 62, cover: "assets/listings/cozyroom.jpg", gallery: ["assets/listings/cozyroom.jpg","assets/listings/cozyroom.jpg"], heating: "Central", amenities: ["Wi-Fi", "Balcony", "Lift"], description: "Bright apartment near the center." },
+  { id: 5, title: "City Center Apartment - Tuzla", municipality: "Tuzla", priceBAM: 60,  beds: 1, baths: 1, size: 35, cover: "assets/listings/oneroom.jpg", gallery: ["assets/listings/oneroom.jpg","assets/listings/oneroom.jpg"], heating: "Electric", amenities: ["Wi-Fi", "Washer", "Kitchen"], description: "Close to cafes and Salt Lakes." },
+  { id: 6, title: "Old Bridge View - Mostar", municipality: "Mostar", priceBAM: 110,  beds: 2, baths: 1, size: 55, cover: "assets/listings/bohoroom.jpg", gallery: ["assets/listings/bohoroom.jpg","assets/listings/bohoroom.jpg"], heating: "Central", amenities: ["Wi-Fi", "AC", "Kitchen"], description: "Steps from Stari Most with a balcony." },
 ];
 
 // ===== HELPERS / RENDERERS =====
-function cardHTML(item) {
+function cardHTML(item, isFeatured = false) {
   return `
   <div class="col">
     <div class="card h-100 shadow-sm position-relative">
-      ${item.rating >= 4.8 ? `<div class="badge bg-success text-white position-absolute" style="top:0.5rem;right:0.5rem">Top Rated</div>` : ""}
+    ${isFeatured ? `<div class="badge bg-success text-white position-absolute" style="top:0.5rem; right:0.5rem;">Top Pick</div>` : ""}
       <img class="card-img-top" src="${item.cover}" alt="${item.title}">
       <div class="card-body d-flex flex-column justify-content-between">
         <h3 class="h6 mb-1">${item.title}</h3>
         <div class="text-muted small mb-2">${item.municipality}</div>
         <div class="d-flex justify-content-between align-items-center">
-          <div class="text-muted small"><i class="bi bi-star-fill text-warning"></i> ${item.rating}</div>
           <div><span class="fw-semibold">${item.priceBAM}</span> <span class="text-muted">BAM / night</span></div>
         </div>
       </div>
@@ -47,13 +46,12 @@ $(document).on("click", ".view-listing-btn", function () {
 function renderListingsPage() {
   const grid = document.getElementById("listingsGrid");
   if (!grid) return;
-  grid.innerHTML = LISTINGS.map(cardHTML).join("");
+  grid.innerHTML = LISTINGS.map(item => cardHTML(item)).join("");
 }
-
 function renderHomeFeatured() {
   const grid = document.getElementById("featuredGrid");
   if (!grid) return;
-  grid.innerHTML = LISTINGS.slice(0, 4).map(cardHTML).join("");
+  grid.innerHTML = LISTINGS.slice(0, 4).map(item => cardHTML(item, true)).join("");
 }
 
 function renderListingDetailsPage(id) {
@@ -63,7 +61,6 @@ function renderListingDetailsPage(id) {
 
   document.getElementById("ldTitle").textContent = item.title;
   document.getElementById("ldPrice").textContent = `${item.priceBAM} BAM / night`;
-  document.getElementById("ldRating").innerHTML = `<i class="bi bi-star-fill text-warning"></i> ${item.rating}`;
   document.getElementById("ldMunicipality").textContent = item.municipality;
   document.getElementById("ldDescription").textContent = item.description;
   document.getElementById("ldHeating").textContent = item.heating;
@@ -98,6 +95,17 @@ function initContactPage() {
   if (!form || !toastEl) return;
   form.addEventListener("submit", e => {
     e.preventDefault();
+    const name = form.querySelector("#name")?.value || "Anonymous";
+    const message = form.querySelector("#message")?.value || "No message.";
+    const date = new Date().toLocaleString();
+
+    const senderRole = localStorage.getItem("userRole");
+    const receiverKey = senderRole === "landlord" ? "userInbox" : "landlordInbox";
+
+    const inbox = JSON.parse(localStorage.getItem(receiverKey) || "[]");
+    inbox.push({ sender: name, text: message, date });
+    localStorage.setItem(receiverKey, JSON.stringify(inbox));
+
     if (window.bootstrap?.Toast) {
       const toast = new bootstrap.Toast(toastEl);
       toast.show();
@@ -153,6 +161,7 @@ $(document).ready(function () {
   app.route({
     view: "dashboard_landlord",
     onCreate: function () {
+      renderInbox(); 
       const role = localStorage.getItem("userRole");
       if (role !== "landlord") { window.location.hash = "#login"; return; }
       setTimeout(() => {
@@ -178,6 +187,7 @@ $(document).ready(function () {
   app.route({
     view: "dashboard_user",
     onCreate: function () {
+      renderInbox(); 
       const role = localStorage.getItem("userRole");
       if (role !== "user") { window.location.hash = "#login"; return; }
       setTimeout(() => {
@@ -200,3 +210,36 @@ $(document).ready(function () {
 
   app.run();
 });
+
+        // year + dynamic dashboard link
+        document.getElementById('year').textContent = new Date().getFullYear();
+        const role = localStorage.getItem("userRole");
+        const navDash = document.getElementById("navDashboard");
+        if (navDash) {
+          if (role === "user") navDash.href = "#dashboard_user";
+          else if (role === "landlord") navDash.href = "#dashboard_landlord";
+          else navDash.href = "#login";
+        }
+ function renderInbox() {
+  const role = localStorage.getItem("userRole");
+  const inboxKey = role === "landlord" ? "landlordInbox" : "userInbox";
+  const messages = JSON.parse(localStorage.getItem(inboxKey) || "[]");
+
+  const container = document.getElementById("inboxContainer");
+  if (!container) return;
+
+  if (messages.length === 0) {
+    container.innerHTML = `<div class="text-muted small">No messages yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = messages.map(msg => `
+    <div class="alert alert-light border mb-2">
+      <i class="bi bi-person-circle text-success me-2"></i>
+      <strong>${msg.sender}</strong> 
+      <span class="text-muted small">(${msg.date})</span>
+      <div>${msg.text}</div>
+    </div>
+  `).join("");
+}
+   
