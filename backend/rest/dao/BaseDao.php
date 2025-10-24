@@ -28,7 +28,9 @@ class BaseDao {
        $placeholders = ":" . implode(", :", array_keys($data));
        $sql = "INSERT INTO " . $this->table . " ($columns) VALUES ($placeholders)";
        $stmt = $this->connection->prepare($sql);
-       return $stmt->execute($data);
+       $stmt->execute($data);
+       $id = $this->connection->lastInsertId();  // get newly inserted ID
+       return $this->getById($id);               // fetch and return the inserted record
    }
 
    public function update($id, $data) {
