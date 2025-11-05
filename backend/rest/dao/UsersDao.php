@@ -16,14 +16,7 @@ class UsersDao extends BaseDao {
 
     //register new user
     public function insert_user($user) {
-        $data = [
-            "role" => $user["role"],             
-            "first_name" => $user["first_name"],
-            "last_name" => $user["last_name"],
-            "email" => $user["email"],
-            "password_hash" => $user["password_hash"],  //will already be hashed in BLL
-        ];
-        return $this->insert($data);
+        return $this->insert($user);
     }
 
     //for dashboard

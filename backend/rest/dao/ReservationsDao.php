@@ -9,15 +9,7 @@ class ReservationsDao extends BaseDao {
 
     //renter books listing
     public function insert_reservation($reservation) {
-        $data = [
-            "listings_id" => $reservation["listings_id"],
-            "users_id"    => $reservation["users_id"], //renter id
-            "start_date"  => $reservation["start_date"],
-            "end_date"    => $reservation["end_date"],
-            "total_price" => $reservation["total_price"],
-            "status"      => $reservation["status"]    //pending, coancelled, completed.
-        ];
-        return $this->insert($data);
+        return $this->insert($reservation);
     }
     public function get_all_reservations() {
         return $this->getAll();

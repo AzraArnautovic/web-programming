@@ -15,5 +15,11 @@ class ReservationsService extends BaseService {
     public function getReservationsForLandlord($landlord_id) {
         return $this->dao->get_reservations_for_landlord($landlord_id);
     }
+
+    public function updateReservationsStatus($id, $status) {
+        return $this->dao->update_reservation_status($id, $status);
+
+    }
+    
 }
 ?>

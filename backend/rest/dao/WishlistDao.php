@@ -8,11 +8,7 @@ class WishlistDao extends BaseDao {
     }
 
     public function add_to_wishlist($wishlist) {
-        $data = [
-            "users_id" => $wishlist["users_id"],
-            "listings_id" => $wishlist["listings_id"]
-        ];
-        return $this->insert($data);
+        return $this->insert($wishlist);
     }
 
     public function get_wishlist_by_user($user_id) {

@@ -8,12 +8,7 @@ class MessagesDao extends BaseDao {
     }
 
     public function send_message($message) {
-        $data = [
-            "sender_id"   => $message["sender_id"],   //who sends the message
-            "receiver_id" => $message["receiver_id"], //who receives the message
-            "content"     => $message["content"]
-        ];
-        return $this->insert($data);
+        return $this->insert($message);
     }
 
     //for testing
