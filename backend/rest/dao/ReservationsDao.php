@@ -52,7 +52,7 @@ class ReservationsDao extends BaseDao {
         ");
         $stmt->bindParam(":status", $status);
         $stmt->bindParam(":id", $id);
-        return $stmt->execute();
+        return $stmt->rowCount() > 0;
     }
 
     public function delete_reservation($id) {
