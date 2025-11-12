@@ -10,21 +10,7 @@ class ListingsDao extends BaseDao {
 
     //used by landlords
     public function insert_listing($listing) {
-        $data = [
-            "users_id"     => $listing["users_id"], //landlords
-            "title"        => $listing["title"],
-            "municipality" => $listing["municipality"],
-            "address"      => $listing["address"],
-            "price"        => $listing["price"],
-            "beds"         => $listing["beds"],
-            "baths"        => $listing["baths"],
-            "heating"      => $listing["heating"], //ENUM:Central, Electric, Wood Stove
-            "size_m2"      => $listing["size_m2"],
-            "cover_url"    => $listing["cover_url"],
-            "description"  => $listing["description"],
-            "amenities"    => $listing["amenities"]
-        ];
-        return $this->insert($data);
+        return $this->insert($listing);
     }
 
     //for homepage or renters

@@ -34,15 +34,28 @@ class BaseDao {
    }
 
    public function update($id, $data) {
-       $fields = "";
+
+       $fields = [];
+       $params = [];
        foreach ($data as $key => $value) {
-           $fields .= "$key = :$key, ";
+        // skip empty keys or reserved ones
+        if ($key === 'id' || trim($key) === '') continue;
+
+           $fields[] = "$key = :$key";
+           $params[$key] = $value;
        }
-       $fields = rtrim($fields, ", ");
-       $sql = "UPDATE " . $this->table . " SET $fields WHERE id = :id";
+    
+       $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = :id";
+       $params['id'] = $id; 
+
+        // Debug check: log or print the query and params
+     //error_log("SQL: $sql");
+     //error_log(" PARAMS: " . print_r($params, true));
+
        $stmt = $this->connection->prepare($sql);
-       $data['id'] = $id;
-       return $stmt->execute($data);
+       return $stmt->execute($params);
+
+       return true;
    }
 
    public function delete($id) {
