@@ -1,6 +1,4 @@
 <?php
-//use Firebase\JWT\JWT;
-//use Firebase\JWT\Key;
 
 Flight::group('/auth', function() {
 
@@ -10,6 +8,9 @@ Flight::group('/auth', function() {
      *     tags={"auth"},
      *     summary="Register a new user",
      *     description="Creates a new user account (renter or landlord).",
+     *     security={
+     *         {"ApiKey": {}}
+     *     },
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -87,7 +88,7 @@ Flight::group('/auth', function() {
                 'data' => $response['data']
             ]);
         } else {
-            Flight::halt(401, $response['error']);
+            Flight::halt(500, $response['error']);
         }
     });
 });
