@@ -1,9 +1,13 @@
 <?php
+require_once __DIR__ . '/../../data/roles.php';
 /**
  * @OA\Get(
  *      path="/messages",
  *      tags={"messages"},
  *      summary="Get all messages",
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *      @OA\Response(
  *           response=200,
  *           description="Array of all messages in the database"
@@ -11,7 +15,19 @@
  * )
  */
 Flight::route('GET /messages', function() {
-    Flight::json(Flight::messagesService()->getAll());
+    Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
+    $user = Flight::get('user'); // from JWT
+    //Fetch both inbox and outbox for the loggedin user
+    $inbox = Flight::messagesService()->getInbox($user->id);
+    $outbox = Flight::messagesService()->getOutbox($user->id);
+
+    //Combine results
+    $messages = [
+        'inbox' => $inbox,
+        'outbox' => $outbox
+    ];
+
+    Flight::json($messages);
 });
 
 /**
@@ -22,13 +38,15 @@ Flight::route('GET /messages', function() {
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"sender_id", "receiver_id", "content"},
- *             @OA\Property(property="sender_id", type="integer", example=3, description="ID of the user sending the message"),
- *             @OA\Property(property="receiver_id", type="integer", example=5, description="ID of the user receiving the message"),
+ *             required={ "receiver_id", "content"},
+ *             @OA\Property(property="receiver_id", type="integer", example=11, description="ID of the user receiving the message"),
  *             @OA\Property(property="content", type="string", example="Hi, is this listing still available?"),
- *             @OA\Property(property="sent_at", type="string", format="date-time", example="2025-11-10T10:45:00Z")
+ *             @OA\Property(property="sent_at", type="string", format="date-time", example="2025-11-10 10:45:00")
  *         )
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Message sent successfully"
@@ -40,10 +58,15 @@ Flight::route('GET /messages', function() {
  * )
  */
 Flight::route('POST /messages', function() {
+    Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
     $data = Flight::request()->data->getData();
 
-    if (empty($data['sender_id']) || empty($data['receiver_id']) || empty($data['content'])) {
-        Flight::json(['error' => 'Missing sender_id, receiver_id, or content.'], 400);
+     //Force sender from JWT
+    $user = Flight::get('user');
+    $data['sender_id'] = $user->id;
+
+    if (empty($data['receiver_id']) || empty($data['content'])) {
+        Flight::json(['error' => 'Missing receiver_id, or content.'], 400);
         return;
     }
 
@@ -66,6 +89,9 @@ Flight::route('POST /messages', function() {
  *         description="ID of the user whose inbox to retrieve",
  *         @OA\Schema(type="integer", example=5)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Array of messages received by the specified user"
@@ -73,10 +99,13 @@ Flight::route('POST /messages', function() {
  * )
  */
 Flight::route('GET /messages/inbox/@receiver_id', function($receiver_id) {
+     Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
+    Flight::auth_middleware()->authorizeOwnership($receiver_id);
+    
     $messages = Flight::messagesService()->getInbox($receiver_id);
 
     if (empty($messages)) {
-        Flight::json(['message' => 'Inbox is empty for this user.']);
+        Flight::json(['message' => 'Inbox is empty.']);
     } else {
         Flight::json($messages);
     }
@@ -93,6 +122,9 @@ Flight::route('GET /messages/inbox/@receiver_id', function($receiver_id) {
  *         description="ID of the user whose sent messages to retrieve",
  *         @OA\Schema(type="integer", example=3)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Array of messages sent by the specified user"
@@ -100,10 +132,13 @@ Flight::route('GET /messages/inbox/@receiver_id', function($receiver_id) {
  * )
  */
 Flight::route('GET /messages/outbox/@sender_id', function($sender_id) {
+     Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
+    Flight::auth_middleware()->authorizeOwnership($sender_id);
+
     $messages = Flight::messagesService()->getOutbox($sender_id);
 
     if (empty($messages)) {
-        Flight::json(['message' => 'Outbox is empty for this user.']);
+        Flight::json(['message' => 'Outbox is empty.']);
     } else {
         Flight::json($messages);
     }
@@ -121,6 +156,9 @@ Flight::route('GET /messages/outbox/@sender_id', function($sender_id) {
  *         description="ID of the first user in the conversation",
  *         @OA\Schema(type="integer", example=3)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Parameter(
  *         name="user2",
  *         in="path",
@@ -135,13 +173,16 @@ Flight::route('GET /messages/outbox/@sender_id', function($sender_id) {
  * )
  */
 Flight::route('GET /messages/conversation/@user1/@user2', function($user1, $user2) {
-    $conversation = Flight::messagesService()->getConversation($user1, $user2);
+     Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
 
-    if (empty($conversation)) {
-        Flight::json(['message' => 'No conversation found between these users.']);
-    } else {
-        Flight::json($conversation);
+     $user = Flight::get('user');
+    //only allow if loggedin user is one of the participants
+    if ($user->id != $user1 && $user->id != $user2) {
+        Flight::halt(403, 'Access denied: you can only view your own conversations');
     }
+
+    $conversation = Flight::messagesService()->getConversation($user1, $user2);
+    Flight::json(empty($conversation) ? ['message' => 'No conversation found.'] : $conversation);
 });
 
 /**
@@ -156,6 +197,9 @@ Flight::route('GET /messages/conversation/@user1/@user2', function($user1, $user
  *         description="Message ID",
  *         @OA\Schema(type="integer", example=10)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Message deleted successfully"
@@ -167,12 +211,24 @@ Flight::route('GET /messages/conversation/@user1/@user2', function($user1, $user
  * )
  */
 Flight::route('DELETE /messages/@id', function($id) {
+    Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
+
+    $user = Flight::get('user');
+    $message = Flight::messagesService()->getById($id);
+
+    if (!$message) {
+        Flight::halt(404, 'Message not found');
+    }
+
+    //Ownership check: only sender can delete their own message
+    Flight::auth_middleware()->authorizeOwnership($message['sender_id']);
+
     $deleted = Flight::messagesService()->delete($id);
 
     if ($deleted) {
-        Flight::json(['message' => 'Message deleted successfully.']);
+        Flight::json(['message' => 'Message deleted successfully.'],200);
     } else {
-        Flight::json(['error' => 'Failed to delete message or message not found.'], 404);
+        Flight::json(['error' => 'Failed to delete message.'], 404);
     }
 });
 ?>
