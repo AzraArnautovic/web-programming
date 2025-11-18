@@ -1,9 +1,14 @@
 <?php
+require_once __DIR__ . '/../../data/roles.php';
+
 /**
  * @OA\Get(
  *      path="/listings",
  *      tags={"listings"},
  *      summary="Get all listings (for homepage or renters)",
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *      @OA\Response(
  *           response=200,
  *           description="Array of all listings in the database or a message if none exist"
@@ -30,6 +35,9 @@ Flight::route('GET /listings', function() {
  *         description="ID of the listing",
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Returns the listing with the given ID"
@@ -54,7 +62,7 @@ Flight::route('GET /listings/@id', function($id) {
  * @OA\Get(
  *     path="/listings/user/{user_id}",
  *     tags={"listings"},
- *     summary="Get all listings created by a specific user (for landlord dashboard)",
+ *     summary="Get all listings created by a specific user (landlord dashboard view)",
  *     @OA\Parameter(
  *         name="user_id",
  *         in="path",
@@ -62,6 +70,9 @@ Flight::route('GET /listings/@id', function($id) {
  *         description="User ID (landlord) whose listings to fetch",
  *         @OA\Schema(type="integer", example=3)
  *     ),
+ *     security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Array of listings for the specified user or a message if none exist"
@@ -69,12 +80,32 @@ Flight::route('GET /listings/@id', function($id) {
  * )
  */
 Flight::route('GET /listings/user/@user_id', function($user_id) {
-    $listings = Flight::listingsService()->getListingsByUser($user_id);
-    if (empty($listings)) {
-        Flight::json(['message' => 'This user has no listings.']);
-    } else {
-        Flight::json($listings);
+  // First check role
+     Flight::auth_middleware()->authorizeRole(Roles::LANDLORD);
+    
+    // Get the logged-in user from JWT
+    $user = Flight::get('user');
+
+    // Enforce that the path user_id matches the logged-in landlord
+    if ($user->id != $user_id) {
+        Flight::json(['error' => 'Unauthorized: you can only view your own listings'], 403);
+        return;
     }
+
+    // Fetch listings for this landlord
+    $listings = Flight::listingsService()->getListingsByUser($user_id);
+
+    if (empty($listings)) {
+        Flight::json(['message' => 'You have no listings.']);
+        return;
+    }
+
+    // Optional: double-check ownership across all listings
+    foreach ($listings as $listing) {
+        Flight::auth_middleware()->authorizeOwnership($listing['users_id']);
+    }
+
+    Flight::json($listings);
 });
 
 /**
@@ -85,7 +116,7 @@ Flight::route('GET /listings/user/@user_id', function($user_id) {
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"title", "price", "users_id"},
+ *             required={"title", "price"},
  *             @OA\Property(property="title", type="string", example="Old Town Studio - Sarajevo"),
  *             @OA\Property(property="municipality", type="string", example="Stari Grad"),
  *             @OA\Property(property="price", type="number", example=80),
@@ -95,10 +126,12 @@ Flight::route('GET /listings/user/@user_id', function($user_id) {
  *             @OA\Property(property="heating", type="string", enum={"Central", "Electric", "Wood Stove"}, example="Central"),
  *             @OA\Property(property="description", type="string", example="Cozy apartment near Baščaršija."),
  *             @OA\Property(property="amenities", type="string", example="Wi-Fi, Parking, Kitchen"),
- *             @OA\Property(property="cover_url", type="string", example="assets/listings/studio.jpg"),
- *             @OA\Property(property="users_id", type="integer", example=1)
+ *             @OA\Property(property="cover_url", type="string", example="assets/listings/studio.jpg")
  *         )
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Listing created successfully"
@@ -114,11 +147,18 @@ Flight::route('GET /listings/user/@user_id', function($user_id) {
  * )
  */
 Flight::route('POST /listings', function() {
+    // Only landlords can create listings
+    Flight::auth_middleware()->authorizeRole(Roles::LANDLORD);
+    //get request body
     $data = Flight::request()->data->getData();
 
+    //Force ownership: always use the loggedin landlord’s ID from JWT
+    $user = Flight::get('user'); // comes from verifyToken()
+    $data['users_id'] = $user->id; //wout this landlord could spoof ownership
+    
     // Basic validation
-    if (empty($data['title']) || empty($data['price']) || empty($data['users_id'])) {
-        Flight::json(['error' => 'Missing required fields: title, price, or users_id.'], 400);
+    if (empty($data['title']) || empty($data['price'])) {
+        Flight::json(['error' => 'Missing required fields: title or price.'], 400);
         return;
     }
 
@@ -157,6 +197,9 @@ Flight::route('POST /listings', function() {
  *             @OA\Property(property="description", type="string", example="Newly renovated apartment near the center.")
  *         )
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Listing updated successfully"
@@ -172,8 +215,15 @@ Flight::route('POST /listings', function() {
  * )
  */
 Flight::route('PUT /listings/@id', function($id) {
-    $data = Flight::request()->data->getData();
+    Flight::auth_middleware()->authorizeRole(Roles::LANDLORD);
 
+    $listing = Flight::listingsService()->getById($id);
+ if (!$listing) {
+        Flight::halt(404, 'Listing not found');
+    }
+    Flight::auth_middleware()->authorizeOwnership($listing['users_id']);
+
+    $data = Flight::request()->data->getData();
     try {
         $updated = Flight::listingsService()->update($id, $data);
         if ($updated) {
@@ -198,6 +248,9 @@ Flight::route('PUT /listings/@id', function($id) {
  *         description="Listing ID",
  *         @OA\Schema(type="integer", example=1)
  *     ),
+ * security={
+ *         {"ApiKey": {}}
+ *     },
  *     @OA\Response(
  *         response=200,
  *         description="Listing deleted successfully"
@@ -213,6 +266,11 @@ Flight::route('PUT /listings/@id', function($id) {
  * )
  */
 Flight::route('DELETE /listings/@id', function($id) {
+    Flight::auth_middleware()->authorizeRole(Roles::LANDLORD);
+
+    $listing = Flight::listingsService()->getById($id);
+    Flight::auth_middleware()->authorizeOwnership($listing['users_id']);
+
     try {
         $deleted = Flight::listingsService()->delete($id);
         if ($deleted) {

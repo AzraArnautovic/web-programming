@@ -1,6 +1,9 @@
 <?php
 require_once 'BaseService.php';
-require_once(__DIR__ . '/../dao/UsersDao.php');
+require_once(__DIR__ . '/../dao/AuthDao.php');
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthService extends BaseService {
 
@@ -48,7 +51,22 @@ class AuthService extends BaseService {
         }
 
         unset($user['password_hash']); //remove sensitive data before returning
-        return ['success' => true, 'data' => $user];
+
+         $jwt_payload = [
+           'user' => $user,
+           'iat' => time(),// If this parameter is not set, JWT will be valid for life. This is not a good approach
+           'exp' => time() + (60 * 60 * 24) // valid for day
+       ];
+
+       $token = JWT::encode(
+           $jwt_payload,
+           Config::JWT_SECRET(),
+           'HS256'
+       );
+
+       return ['success' => true, 'data' => array_merge($user, ['token' => $token])];             
+
     }
+    
 }
 ?>
