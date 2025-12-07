@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../data/roles.php';
  * )
  */
 Flight::route('GET /listings', function() {
+    Flight::auth_middleware()->authorizeRoles([Roles::LANDLORD, Roles::USER]);
     $listings = Flight::listingsService()->getAll();
     if (empty($listings)) {
         Flight::json(['message' => 'No listings available.']);
@@ -95,17 +96,12 @@ Flight::route('GET /listings/user/@user_id', function($user_id) {
     // Fetch listings for this landlord
     $listings = Flight::listingsService()->getListingsByUser($user_id);
 
-    if (empty($listings)) {
-        Flight::json(['message' => 'You have no listings.']);
-        return;
-    }
-
     // Optional: double-check ownership across all listings
     foreach ($listings as $listing) {
         Flight::auth_middleware()->authorizeOwnership($listing['users_id']);
     }
 
-    Flight::json($listings);
+    Flight::json($listings?: []);
 });
 
 /**

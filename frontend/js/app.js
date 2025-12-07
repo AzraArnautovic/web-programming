@@ -1,4 +1,4 @@
-// ===== DATA =====
+/*// ===== DATA =====
 const LISTINGS = [
   { id: 1, title: "Old Town Studio - Sarajevo", municipality: "Stari Grad", priceBAM: 50, beds: 1, baths: 1, size: 28, cover: "assets/listings/1a.jpg", gallery: ["assets/listings/1a.jpg","assets/listings/1a.jpg"], heating: "Central", amenities: ["Wi-Fi", "Heating", "Kitchen"], description: "Cozy studio in Baščaršija. Walk everywhere." },
   { id: 2, title: "Riverside Loft - Mostar", municipality: "Mostar", priceBAM: 70, beds: 1, baths: 1, size: 36, cover: "assets/listings/cottage.jpg", gallery: ["assets/listings/cottage.jpg","assets/listings/cottage.jpg"], heating: "Electric", amenities: ["Wi-Fi", "AC", "Kitchen"], description: "Modern loft near the Neretva with lovely views." },
@@ -112,16 +112,182 @@ function initContactPage() {
     }
     form.reset();
   });
-}
+}*/
+toastr.options = {
+  positionClass: "toast-top-right",
+  timeOut: 3000,
+  extendedTimeOut: 1000,
+  closeButton: true,
+  progressBar: true,
+  preventDuplicates: true,
+  newestOnTop: true
+};
 
 // ===== SPAPP ROUTES =====
 $(document).ready(function () {
   const app = $.spapp({
     defaultView: "home",
-    templateDir: "views/"
+    templateDir: "views/",
+    pageNotFoundView: "404"
   });
 
-  // HOME
+  // Home view
+  app.route({
+    view: "home",
+    load: "home.html",
+    onReady: function () {
+      UserService.loadFeaturedListings();
+    }
+  });
+
+  // Listings view
+  app.route({
+    view: "listings",
+    load: "listings.html",
+    onReady: function () {
+      UserService.loadAllListings();
+    }
+  });
+
+  // Single listing view
+ app.route({
+  view: "listing",
+  load: "listing.html",
+  onReady: function () {
+    const id = sessionStorage.getItem("selectedListingId");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (id) {
+      UserService.loadListingById(id);
+ // Show booking button only if role is USER
+      if (user?.role === Constants.USER_ROLE) {
+        $("#bookListingBtn").removeClass("d-none");
+      } else {
+        $("#bookListingBtn").addClass("d-none");
+      }
+      // Wire up booking button
+      $(document).off("click", "#bookListingBtn").on("click", "#bookListingBtn", function () {
+        $("#reservationListing").val(id);
+        $("#newReservationModal").modal("show");
+      });
+      // Wire up confirm button inside modal
+      $(document).off("click", "#confirmReservationBtn").on("click", "#confirmReservationBtn", function () {
+        UserService.createReservationFromListing(id);
+      });
+    }
+  }
+});
+
+app.route({
+  view: "dashboard_landlord",
+  load: "dashboard_landlord.html",
+  onReady: function () {
+    const token = localStorage.getItem("user_token");
+    const user = token ? Utils.parseJwt(token)?.user : null;
+
+    if (!user || user.role !== "landlord") {
+      window.location.replace("index.html#login");
+      return;
+    }
+    UserService.loadLandlordDashboard();
+    // Open Add New
+    $(document).off("click", "#openAddListing").on("click", "#openAddListing", function () {
+      $("#listingForm")[0].reset();
+      $("#listingForm").removeData("listingId");
+      $("#addListingModal").modal("show");
+    });
+
+    // Save on submit
+    $(document).off("submit", "#listingForm").on("submit", "#listingForm", function (e) {
+      e.preventDefault();
+      UserService.saveListing();
+    });
+
+    // Edit
+    $(document).off("click", ".btn-edit-listing").on("click", ".btn-edit-listing", function () {
+      const id = $(this).data("id");
+      UserService.openEditListing(id);
+    });
+
+    // Delete
+    $(document).off("click", ".btn-delete-listing").on("click", ".btn-delete-listing", function () {
+      const id = $(this).data("id");
+      if (confirm("Delete this listing?")) {
+        UserService.deleteListing(id);
+      }
+    });
+    $(document).off("submit", "#messageForm").on("submit", "#messageForm", function (e) {
+  e.preventDefault();
+  UserService.sendMessage();
+});
+  }
+});
+
+app.route({
+  view: "dashboard_user",
+  load: "dashboard_user.html",
+  onReady: function () {
+    const token = localStorage.getItem("user_token");
+    const user = token ? Utils.parseJwt(token)?.user : null;
+
+    if (!user || user.role !== Constants.USER_ROLE) {
+      window.location.replace("index.html#login");
+      return;
+    }
+
+    UserService.loadUserDashboard();
+
+    // New reservation
+$(document).off("click", "#confirmReservationBtn").on("click", "#confirmReservationBtn", function () {
+  UserService.createReservation();
+});
+
+// Edit reservation
+$(document).off("click", ".btn-edit-reservation").on("click", ".btn-edit-reservation", function () {
+  const id = $(this).data("id");
+  UserService.openEditReservation(id);
+});
+$(document).off("click", "#saveReservationChangesBtn").on("click", "#saveReservationChangesBtn", function () {
+  UserService.saveReservationChanges();
+});
+
+$(document).off("click", ".btn-cancel-reservation").on("click", ".btn-cancel-reservation", function () {
+  const id = $(this).data("id");
+  $("#confirmCancelReservationBtn").data("reservationId", id);
+  $("#cancelBookingModal").modal("show");
+});
+
+$(document).off("click", "#confirmCancelReservationBtn").on("click", "#confirmCancelReservationBtn", function () {
+  const id = $(this).data("reservationId");
+  UserService.cancelReservation(id);
+});
+
+// Wishlist
+$(document).off("click", "#confirmAddWishlistBtn").on("click", "#confirmAddWishlistBtn", function () {
+  UserService.addToWishlist();
+});
+// Messages
+$(document).off("submit", "#messageForm").on("submit", "#messageForm", function (e) {
+  e.preventDefault();
+  UserService.sendMessage();
+});
+ // Populate listing selects for modals
+    UserService.populateListingSelects();
+  }
+});
+// View listing from wishlist
+$(document).off("click", ".view-listing-btn").on("click", ".view-listing-btn", function () {
+  const id = $(this).data("id");
+  if (id) {
+    sessionStorage.setItem("selectedListingId", id);
+    window.location.replace("index.html#listing");
+  }
+});
+
+
+  app.run();
+});
+
+ /* // HOME
   app.route({ view: "home", onCreate: renderHomeFeatured });
 
   // LISTINGS
@@ -158,58 +324,86 @@ $(document).ready(function () {
   app.route({ view: "contact", onCreate: initContactPage });
 
   // DASHBOARD (role-guarded) — Landlord
-  app.route({
-    view: "dashboard_landlord",
-    onCreate: function () {
-      renderInbox(); 
-      const role = localStorage.getItem("userRole");
-      if (role !== "landlord") { window.location.hash = "#login"; return; }
-      setTimeout(() => {
-        const el = document.getElementById("calendar");
-        if (el && window.FullCalendar) {
-          const calendar = new FullCalendar.Calendar(el, {
-            initialView: "dayGridMonth",
-            height: 550,
-            headerToolbar: { left: "prev,next today", center: "title", right: "" },
-            events: [
-              { title: "Sara K. - Old Town Studio", start: "2025-10-02", end: "2025-10-04", color: "#dc3545" },
-              { title: "John D. - Blagaj Resort", start: "2025-10-10", end: "2025-10-13", color: "#dc3545" },
-              { title: "Marko T. - Sunny Apartment", start: "2025-10-20", end: "2025-10-22", color: "#dc3545" }
-            ]
-          });
-          calendar.render();
-        }
-      }, 150);
+app.route({
+  view: "dashboard_landlord",
+  onCreate: function () {
+    renderInbox(); 
+    const role = localStorage.getItem("userRole");
+    if (role !== "landlord") { 
+      window.location.hash = "#login"; 
+      return; 
     }
-  });
 
-  // DASHBOARD (role-guarded) — User
-  app.route({
-    view: "dashboard_user",
-    onCreate: function () {
-      renderInbox(); 
-      const role = localStorage.getItem("userRole");
-      if (role !== "user") { window.location.hash = "#login"; return; }
-      setTimeout(() => {
-        const el = document.getElementById("calendar");
-        if (el && window.FullCalendar) {
-          const calendar = new FullCalendar.Calendar(el, {
-            initialView: "dayGridMonth",
-            height: 500,
-            headerToolbar: { left: "prev,next today", center: "title", right: "" },
-            events: [
-              { title: "Blagaj Resort", start: "2025-10-10", end: "2025-10-13", color: "#198754" },
-              { title: "Old Town Studio", start: "2025-10-02", end: "2025-10-04", color: "#198754" }
-            ]
+    const el = document.getElementById("calendar");
+    if (el && window.FullCalendar) {
+      const calendar = new FullCalendar.Calendar(el, {
+        initialView: "dayGridMonth",
+        height: 550,
+        headerToolbar: { left: "prev,next today", center: "title", right: "" },
+
+        // Dynamic events from backend
+        events: function(fetchInfo, successCallback, failureCallback) {
+          RestClient.get(`reservations/landlord/${landlordId}`, function(response) {
+            // Transform backend data into FullCalendar format
+            const events = response.data.map(r => ({
+              title: `${r.user_name} - ${r.listing_name}`,
+              start: r.start_date,
+              end: r.end_date,
+              color: "#dc3545"
+            }));
+            successCallback(events);
+          }, function(error) {
+            console.error("Failed to load reservations:", error);
+            failureCallback(error);
           });
-          calendar.render();
         }
-      }, 150);
+      });
+      calendar.render();
     }
-  });
-
-  app.run();
+  }
 });
+
+
+ // DASHBOARD (role-guarded) — User
+app.route({
+  view: "dashboard_user",
+  onCreate: function () {
+    renderInbox(); 
+    const role = localStorage.getItem("userRole");
+    if (role !== "user") { 
+      window.location.hash = "#login"; 
+      return; 
+    }
+
+    const el = document.getElementById("calendar");
+    if (el && window.FullCalendar) {
+      const calendar = new FullCalendar.Calendar(el, {
+        initialView: "dayGridMonth",
+        height: 500,
+        headerToolbar: { left: "prev,next today", center: "title", right: "" },
+
+        // Dynamic events for the logged-in user
+        events: function(fetchInfo, successCallback, failureCallback) {
+          RestClient.get(`reservations/user/${userId}`, function(response) {
+            // Transform backend data into FullCalendar format
+            const events = response.data.map(r => ({
+              title: r.listing_name,   // show just the property name for user
+              start: r.start_date,
+              end: r.end_date,
+              color: "#198754"
+            }));
+            successCallback(events);
+          }, function(error) {
+            console.error("Failed to load user reservations:", error);
+            failureCallback(error);
+          });
+        }
+      });
+      calendar.render();
+    }
+  }
+});
+
 
         // year + dynamic dashboard link
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -242,4 +436,5 @@ $(document).ready(function () {
     </div>
   `).join("");
 }
-   
+ });
+*/

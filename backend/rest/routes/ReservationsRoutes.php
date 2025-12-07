@@ -139,6 +139,19 @@ Flight::route('POST /reservations', function() {
     $user = Flight::get('user');
     //Force renter ownership
     $data['users_id'] = $user->id; //Prevent spoofing by overriding users_id with JWT user.
+//Calculate total_price in backend before inserting
+    $listing = Flight::listingsService()->getById($data['listings_id']);
+if (!$listing) {
+    Flight::halt(404, 'Listing not found');
+    return;
+}
+
+$start = new DateTime($data['start_date']);
+$end = new DateTime($data['end_date']);
+$days = $start->diff($end)->days;
+
+$data['total_price'] = $listing['price'] * $days;
+
     Flight::json(Flight::reservationsService()->create($data));
 });
 

@@ -6,14 +6,17 @@
     <title>Bosnia Rentals - Milestone 1</title>
 
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!--<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Toastr CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
     <link href="css/styles.css" rel="stylesheet" />
     <!-- SPApp CSS  -->
     <link rel="stylesheet" href="css/spapp.css" />
 
     <!-- FullCalendar CSS -->
-    <link href="https://unpkg.com/@fullcalendar/core@6.1.10/index.global.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.19/index.min.css" rel="stylesheet" />
   </head>
 
   <body>
@@ -31,7 +34,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0" id="nav">
             <li class="nav-item"><a class="nav-link px-3 active" href="#home">Home</a></li>
             <li class="nav-item"><a class="nav-link px-3" href="#listings">Listings</a></li>
             <li class="nav-item"><a class="nav-link px-3" href="#dashboard_landlord" id="navDashboard">Dashboard</a></li>
@@ -41,6 +44,8 @@
           <div class="d-flex align-items-center gap-2">
             <a class="btn btn-outline-dark" href="#login">Login</a>
             <a class="btn btn-dark" href="#register">Sign Up</a>
+            <a class="btn btn-dark" onclick="UserService.logout()">Logout</a>
+    
           </div>
         </div>
       </div>
@@ -59,7 +64,6 @@
   <section id="contact" data-load="contact.html"></section>
 </main>
 
-
     <!-- Footer -->
     <footer class="py-5 bg-dark">
       <div class="container">
@@ -69,12 +73,25 @@
       </div>
     </footer>
 
-    <!-- JS deps: Bootstrap bundle (for toasts), FullCalendar, jQuery, SPApp, your app -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/@fullcalendar/core@6.1.10/index.global.min.js"></script>
-    <script src="https://unpkg.com/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="js/jquery.spapp.min.js"></script>
-    <script src="js/app.js"></script>
+<!-- Core libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.19/index.global.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.19/daygrid/index.global.min.js"></script>
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<!-- App utilities -->
+<script src="./utils/constant.js"></script>
+<script src="utils/rest-client.js"></script>
+<script src="utils/utils.js"></script>
+
+<!-- App logic -->
+<script src="js/jquery.spapp.min.js"></script>
+<script src="services/user-service.js"></script>
+<script src="js/app.js"></script>
+
+
   </body>
 </html>

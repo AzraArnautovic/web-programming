@@ -1,42 +1,88 @@
 <div class="container my-5">
-  <h2 class="text-center mb-4">Contact Us</h2>
+  <h2 class="text-center mb-4">Contact Bosnia Rentals</h2>
   <p class="text-center text-muted mb-5">
-    Have a question or need help? Send us a message - our team will get back to you shortly.
+    We're here to help you make the most of your stay. While we currently don't offer direct messaging through this page, you can find answers to common questions below or reach out via our support email.
   </p>
-  <form id="contactForm" class="mx-auto" style="max-width: 600px;">
-    <div class="mb-3">
-      <label class="form-label">Your Name</label>
-      <input type="text" class="form-control" id="contactName" placeholder="John Doe" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Email Address</label>
-      <input type="email" class="form-control" id="contactEmail" placeholder="example@email.com" required>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Are you a</label>
-      <select class="form-select" id="userType" required>
-        <option value="" disabled selected>Select your role</option>
-        <option value="renter">Renter</option>
-        <option value="landlord">Landlord</option>
-      </select>
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Message</label>
-      <textarea class="form-control" id="contactMessage" rows="5" placeholder="Write your message here..." required></textarea>
-    </div>
-    <button type="submit" class="btn btn-dark w-100">Send Message</button>
-  </form>
-</div>
 
-<!-- Toaster -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="contactToast" class="toast align-items-center text-white bg-success border-0" role="alert">
-    <div class="d-flex">
-      <div class="toast-body">
-        ✅ Message sent successfully! We will get back to you soon.
+  <!-- Support Section -->
+  <div class="mx-auto mb-5" style="max-width: 700px;">
+    <div class="p-4 border rounded shadow-sm mb-4 bg-light">
+      <h5>📧 Email Support</h5>
+      <p class="text-muted mb-0">
+        For inquiries, please email us at <strong>support@bosniarentals.com</strong>.  
+        We typically respond within 24–48 hours.
+      </p>
+    </div>
+
+    <div class="p-4 border rounded shadow-sm mb-4 bg-light">
+      <h5>🌍 Social Media</h5>
+      <p class="text-muted mb-0">
+        Follow us on Instagram and Facebook for travel tips, updates, and local highlights.
+      </p>
+    </div>
+  </div>
+
+  <!-- FAQ Section -->
+  <div class="mx-auto" style="max-width: 700px;">
+    <h3 class="mb-4 text-center">📚 Frequently Asked Questions</h3>
+    <ul class="list-group list-group-flush mb-5">
+      <li class="list-group-item"><a href="#faq-booking">How do I book a rental?</a></li>
+      <li class="list-group-item"><a href="#faq-cancel">Can I cancel or modify my reservation?</a></li>
+      <li class="list-group-item"><a href="#faq-payment">What payment methods are accepted?</a></li>
+      <li class="list-group-item"><a href="#faq-phone">Is there a customer service phone number?</a></li>
+      <li class="list-group-item"><a href="#faq-checkin">What are the check-in and check-out times?</a></li>
+      <li class="list-group-item"><a href="#faq-refund">Do you offer refunds?</a></li>
+      <li class="list-group-item"><a href="#faq-discounts">Are there discounts for long-term stays?</a></li>
+      <li class="list-group-item"><a href="#faq-safety">Is Bosnia Rentals safe and secure?</a></li>
+      <li class="list-group-item"><a href="#faq-support">How do I contact support during my stay?</a></li>
+    </ul>
+
+    <!-- FAQ Answers -->
+    <div class="faq-answers">
+      <div id="faq-booking" class="mb-5">
+        <h5>How do I book a rental?</h5>
+        <p class="text-muted">Browse listings, choose your dates, and click “Book Now.” You’ll receive a confirmation email once your booking is complete.</p>
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+
+      <div id="faq-cancel" class="mb-5">
+        <h5>Can I cancel or modify my reservation?</h5>
+        <p class="text-muted">Yes, you can cancel or change your reservation from your dashboard. Cancellation policies vary by listing.</p>
+      </div>
+
+      <div id="faq-payment" class="mb-5">
+        <h5>What payment methods are accepted?</h5>
+        <p class="text-muted">We accept major credit cards and PayPal. All payments are processed securely through our platform.</p>
+      </div>
+
+      <div id="faq-phone" class="mb-5">
+        <h5>Is there a customer service phone number?</h5>
+        <p class="text-muted">At this time, we offer support via email only. For urgent issues, please include “URGENT” in your subject line.</p>
+      </div>
+
+      <div id="faq-checkin" class="mb-5">
+        <h5>What are the check-in and check-out times?</h5>
+        <p class="text-muted">Check-in is typically after 2:00 PM, and check-out is before 11:00 AM. Exact times may vary by property.</p>
+      </div>
+
+      <div id="faq-refund" class="mb-5">
+        <h5>Do you offer refunds?</h5>
+        <p class="text-muted">Refunds depend on the cancellation policy of the listing. Please review the policy before booking.</p>
+      </div>
+
+      <div id="faq-discounts" class="mb-5">
+        <h5>Are there discounts for long-term stays?</h5>
+        <p class="text-muted">Yes, many hosts offer discounted rates for weekly or monthly stays. Look for “Special Offers” on the listing page.</p>
+      </div>
+
+      <div id="faq-safety" class="mb-5">
+        <h5>Is Bosnia Rentals safe and secure?</h5>
+        <p class="text-muted">All payments are processed securely, and hosts are verified. We also encourage guests to review listings and ratings before booking.</p>
+      </div>
+
+      <div id="faq-support" class="mb-5">
+        <h5>How do I contact support during my stay?</h5>
+        <p class="text-muted">You can reach us anytime via email. For urgent matters, mark your subject line as “URGENT” and we’ll prioritize your request.</p>
+      </div>
     </div>
   </div>
 </div>
-

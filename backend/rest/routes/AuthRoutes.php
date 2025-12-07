@@ -46,6 +46,7 @@ Flight::group('/auth', function() {
                 'data' => $response['data']
             ]);
         } else {
+            error_log("Register failed: " . $response['error']); // log to PHP error log
             Flight::halt(500, $response['error']);
         }
     });
