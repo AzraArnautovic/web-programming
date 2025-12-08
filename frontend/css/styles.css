@@ -93,6 +93,7 @@
 
 body {
   margin: 0;
+    padding-top: 70px; /* equal to navbar height */
   font-family: var(--bs-body-font-family);
   font-size: var(--bs-body-font-size);
   font-weight: var(--bs-body-font-weight);
@@ -3603,6 +3604,31 @@ textarea.form-control-lg {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
+/* Make sure the toast is above nav, modal, and overlays */
+#toast-container {
+  z-index: 5000 !important; /* Bootstrap navbar ~1030, modal backdrop ~1040 */
+}
+
+/* Ensure toast content is visible */
+#toast-container > .toast {
+  opacity: 1 !important;
+  background: rgba(0,0,0,0.85) !important; /* readable on light pages */
+  color: #fff !important;
+}
+
+/* Message text visibility */
+#toast-container .toast-message {
+  color: #fff !important;
+  font-size: 0.95rem !important;
+}
+
+/* Title visibility (if used) */
+#toast-container .toast-title {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
 
 .nav {
   --bs-nav-link-padding-x: 1rem;
@@ -10853,3 +10879,26 @@ textarea.form-control-lg {
   justify-content: center;
   text-align: center;
 }
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+.badge-amenity {
+  font-size: 1.1rem;        /* bigger text */
+  padding: 0.6rem 1rem;     /* more space inside */
+  border-radius: 1rem;      /* pill shape */
+  background-color: #f0f0f0; /* light background */
+  color: #333;              /* dark text */
+  margin: 0.3rem;           /* spacing between badges */
+  display: inline-block;
+}
+

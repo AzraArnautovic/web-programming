@@ -2,7 +2,7 @@
   <div class="container">
     <!-- Header -->
     <div class="mb-4">
-      <h1 class="h4 fw-semibold">Welcome, Amar</h1>
+      <h1 class="h4 fw-semibold">Welcome, <span id="userName"></span></h1>
       <p class="text-muted mb-0">Your Travel Dashboard Overview</p>
     </div>
 
@@ -10,19 +10,19 @@
     <div class="row g-3 mb-4">
       <div class="col-md-4">
         <div class="text-muted small">Active Reservations</div>
-        <div class="h1 mb-0 fw-bold">2</div>
+        <div id="activeReservations" class="h1 mb-0 fw-bold">0</div>
       </div>
       <div class="col-md-4">
         <div class="text-muted small">Past Stays</div>
-        <div class="h1 mb-0 fw-bold">4</div>
+        <div id="pastStays" class="h1 mb-0 fw-bold">0</div>
       </div>
       <div class="col-md-4">
         <div class="text-muted small">Total Spent (BAM)</div>
-        <div class="h1 mb-0 fw-bold">520</div>
+        <div id="totalSpent" class="h1 mb-0 fw-bold">0</div>
       </div>
     </div>
 
-    <!-- My Bookings -->
+    <!-- My Reservations -->
     <div class="border rounded p-3 mb-4 bg-white">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h5 class="mb-0">My Reservations</h5>
@@ -30,29 +30,21 @@
           <i class="bi bi-plus-circle me-1"></i> New Booking
         </button>
       </div>
-      <ul class="list-group list-group-flush">
+      <ul id="userReservations" class="list-group list-group-flush">
+        <!-- Reservations injected dynamically -->
+        <!-- Example structure:
         <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-          Blagaj Resort – <span class="text-muted small">Oct 10-13, 2025</span>
+          Title – <span class="text-muted small">Oct 10-13, 2025</span>
           <div>
-            <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#editBookingModal">
+            <button class="btn btn-sm btn-outline-secondary me-1 btn-edit-reservation" data-id="123">
               <i class="bi bi-pencil"></i> Edit
             </button>
-            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelBookingModal">
+            <button class="btn btn-sm btn-outline-danger btn-cancel-reservation" data-id="123">
               <i class="bi bi-x-circle"></i> Cancel
             </button>
           </div>
         </li>
-        <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0">
-          Old Town Studio – <span class="text-muted small">Oct 2-4, 2025</span>
-          <div>
-            <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#editBookingModal">
-              <i class="bi bi-pencil"></i> Edit
-            </button>
-            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelBookingModal">
-              <i class="bi bi-x-circle"></i> Cancel
-            </button>
-          </div>
-        </li>
+        -->
       </ul>
     </div>
 
@@ -64,39 +56,62 @@
           <i class="bi bi-plus-circle me-1"></i> Add to Wishlist
         </button>
       </div>
-      <div class="row row-cols-1 row-cols-md-2 g-3">
+      <div id="wishlistGrid" class="row row-cols-1 row-cols-md-2 g-3">
+        <!-- Wishlist items injected dynamically -->
+        <!-- Example structure:
         <div class="col">
           <div class="card h-100 shadow-sm">
-            <img src="assets/listings/exoticpool.jpg" class="card-img-top" alt="Wishlist">
+            <img src="..." class="card-img-top" alt="Wishlist">
             <div class="card-body">
-              <h6 class="card-title mb-1">Sunny Apartment - Banja Luka</h6>
+              <h6 class="card-title mb-1">Listing Title</h6>
               <p class="text-muted small mb-2">95 BAM / night</p>
               <button class="btn btn-sm btn-outline-dark view-listing-btn" data-id="4">
-              <i class="bi bi-eye"></i> View Listing
+                <i class="bi bi-eye"></i> View Listing
               </button>
             </div>
           </div>
         </div>
-        <div class="col">
-          <div class="card h-100 shadow-sm">
-            <img src="assets/listings/oneroom.jpg" class="card-img-top" alt="Wishlist">
-            <div class="card-body">
-              <h6 class="card-title mb-1">City Center Apartment - Tuzla</h6>
-              <p class="text-muted small mb-2">60 BAM / night</p>
-              <button class="btn btn-sm btn-outline-dark view-listing-btn" data-id="5">
-               <i class="bi bi-eye"></i> View Listing
-              </button>
-            </div>
-          </div>
-        </div>
+        -->
       </div>
     </div>
 
-    
-       <!-- Messages Inbox -->
-<div class="border rounded p-3 mb-4 bg-white">
-  <h5><i class="bi bi-envelope-fill text-success me-2"></i> Inbox</h5>
+    <!-- Messages Inbox -->
+    <div class="border rounded p-3 mb-4 bg-white">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5><i class="bi bi-envelope-fill text-success me-2"></i> Inbox</h5>
+    <button id="openComposeMessage" class="btn btn-sm btn-dark text-white" data-bs-toggle="modal" data-bs-target="#composeMessageModal">
+      <i class="bi bi-plus-circle me-1"></i> New Message
+    </button>
+  </div>
   <div id="inboxContainer"></div>
+</div>
+
+<!-- Compose Message Modal -->
+<div class="modal fade" id="composeMessageModal" tabindex="-1" aria-labelledby="composeMessageLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="messageForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="composeMessageLabel">Compose Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Receiver ID</label>
+            <input type="number" name="receiver_id" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Message</label>
+            <textarea name="content" class="form-control" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Send</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
     <!-- Trip Calendar -->
@@ -116,37 +131,40 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="row g-3">
-            <div class="col-md-6">
+        <form id="newReservationForm">
+          <div class="row g-2">
+            <div class="col-md-3">
               <label class="form-label">Select Listing</label>
-              <select class="form-select">
-                <option selected>Choose...</option>
-                <option>Old Town Studio - Sarajevo</option>
-                <option>Blagaj Resort</option>
-                <option>Riverside Loft - Mostar</option>
+              <select id="reservationListing" name="listings_id" class="form-select">
+                <option value="">Choose...</option>
+                <!-- Options injected dynamically -->
               </select>
             </div>
             <div class="col-md-3">
               <label class="form-label">Check-in</label>
-              <input type="date" class="form-control">
+              <input id="reservationCheckIn" name="start_date" type="date" class="form-control">
             </div>
             <div class="col-md-3">
               <label class="form-label">Check-out</label>
-              <input type="date" class="form-control">
+              <input id="reservationCheckOut" name="end_date" type="date" class="form-control">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Guests</label>
+              <input id="reservationGuests" name="guests" type="number" class="form-control" min="1" value="1">
+              <input type="hidden" name="status" value="pending">
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-dark">Confirm Booking</button>
+        <button id="confirmReservationBtn" type="button" class="btn btn-dark">Confirm</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Edit Booking Modal (Hardcoded version) -->
+<!-- Edit Booking Modal -->
 <div class="modal fade" id="editBookingModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -156,33 +174,37 @@
       </div>
       <div class="modal-body">
         <form id="editBookingForm">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label">Listing</label>
-              <input type="text" class="form-control" value="Old Town Studio - Sarajevo">
-            </div>
-            <div class="col-md-3">
+          <div class="row g-2">
+            <div class="col-md-4">
               <label class="form-label">Check-in</label>
-              <input type="date" class="form-control" value="2025-10-02">
+              <input id="editCheckIn" name="start_date" type="date" class="form-control">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label class="form-label">Check-out</label>
-              <input type="date" class="form-control" value="2025-10-04">
+              <input id="editCheckOut" name="end_date" type="date" class="form-control">
             </div>
             <div class="col-md-4">
               <label class="form-label">Guests</label>
-              <input type="number" class="form-control" value="2">
+              <input id="editGuests" name="guests" type="number" class="form-control" min="1" value="1">
             </div>
+            <div class="col-md-4">
+  <label class="form-label">Status</label>
+  <select id="editStatus" name="status" class="form-select">
+    <option value="pending">pending</option>
+    <option value="cancelled">cancelled</option>
+    <option value="completed">completed</option>
+  </select>
+</div>
             <div class="col-12">
               <label class="form-label">Special Requests</label>
-              <textarea class="form-control" rows="3">Near window if possible.</textarea>
+              <textarea id="editRequests" name="special_requests" class="form-control" rows="3"></textarea>
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-dark">Save Changes</button>
+        <button id="saveReservationChangesBtn" type="button" class="btn btn-dark">Save Changes</button>
       </div>
     </div>
   </div>
@@ -202,7 +224,7 @@
       </div>
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep</button>
-        <button type="button" class="btn btn-danger">Cancel Booking</button>
+        <button id="confirmCancelReservationBtn" type="button" class="btn btn-danger">Cancel</button>
       </div>
     </div>
   </div>
@@ -217,20 +239,17 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="addWishlistForm">
           <label class="form-label">Select a Listing</label>
-          <select class="form-select">
-            <option selected>Choose...</option>
-            <option>Old Town Studio - Sarajevo</option>
-            <option>Riverside Loft - Mostar</option>
-            <option>Blagaj Resort</option>
-            <option>City Center Apartment - Tuzla</option>
+          <select id="wishlistListing" name="listings_id" class="form-select">
+            <option value="">Choose...</option>
+            <!-- Options injected dynamically -->
           </select>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-dark">Add to Wishlist</button>
+        <button id="confirmAddWishlistBtn" type="button" class="btn btn-dark">Add to Wishlist</button>
       </div>
     </div>
   </div>
