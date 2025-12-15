@@ -20,7 +20,7 @@ class Config {
    }
    public static function DB_PASSWORD()
    {
-       return self::get_env("DB_PASSWORD", "AVNS_ONu2GOHJKoWcmO4UbRd");
+       return self::get_env("DB_PASSWORD", "");
    }
    public static function DB_HOST()
    {
