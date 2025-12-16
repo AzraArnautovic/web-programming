@@ -1,4 +1,4 @@
-<!-- HTML for static distribution bundle build -->
+<!-- The static Swagger UI page that loads the UI bundle -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -33,7 +33,7 @@
     <script src="swagger-ui-bundle.js"> </script>
     <script src="swagger-ui-standalone-preset.js"> </script>
     <script>
-    window.onload = function() {
+    window.onload = function() { //Browser loads this HTML, JS initializes Swagger UI, fetches swagger.php, and renders the API docs with try-it-out support
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
         url: "swagger.php",

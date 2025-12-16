@@ -1,4 +1,6 @@
+
 <?php
+//entry point of the backend
 header("Access-Control-Allow-Origin: https://shark-app-ioj5q.ondigitalocean.app");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -55,7 +57,7 @@ Flight::before('start', function() {
 //exit;
 
        try {
-           $token = Flight::request()->getHeader("Authentication");
+           $token = Flight::request()->getHeader("Authentication");//This ensures every protected route requires a valid JWT.
            if(Flight::auth_middleware()->verifyToken($token))
                return TRUE;
        } catch (\Exception $e) {

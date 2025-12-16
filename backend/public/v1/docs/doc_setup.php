@@ -1,6 +1,6 @@
 <?php
 
-/**
+/**  //Shows up at the top of Swagger UI
  * @OA\Info(
  *   title="API",
  *   description="Bosnia Rentals API",
