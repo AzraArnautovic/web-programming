@@ -12,7 +12,7 @@
  * )
  * 
  * @OA\Server(
- *     url="https://starfish-app-q5czd.ondigitalocean.app",
+ *     url="http://localhost/AzraArnautovic/web-programming/backend",
  *     description="API server"
  * )
  * 
