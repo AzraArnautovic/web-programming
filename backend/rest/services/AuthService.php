@@ -54,7 +54,7 @@ class AuthService extends BaseService {
 
          $jwt_payload = [
            'user' => $user,
-           'iat' => time(),//issued at; If this parameter is not set, JWT will be valid for life. This is not a good approach
+           'iat' => time(),// If this parameter is not set, JWT will be valid for life. This is not a good approach
            'exp' => time() + (60 * 60 * 24) // valid for day
        ];
 

@@ -6,10 +6,8 @@ class AuthMiddleware {
        if(!$token)
            Flight::halt(401, "Missing authentication header");
        $decoded_token = JWT::decode($token, new Key(Config::JWT_SECRET(), 'HS256'));
-       //from the decoded token object, access the property called user
-       Flight::set('user', $decoded_token->user);           //Uses the secret key from Config::JWT_SECRET() to verify the token’s signature
-       Flight::set('jwt_token', $token); //Flight::set() stores the decoded user object globally for the current request
-       //it allows other parts of the backend (routes, services, and DAOs) to access authenticated user without re-decoding the token.
+       Flight::set('user', $decoded_token->user);
+       Flight::set('jwt_token', $token);
        return TRUE;
    }
    public function authorizeRole($requiredRole) {
