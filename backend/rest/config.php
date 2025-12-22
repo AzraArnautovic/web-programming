@@ -31,8 +31,13 @@ class Config {
        return Config::get_env("JWT_SECRET",'lalapopsik');
    }
 public static function get_env($name, $default){
-       return isset($_ENV[$name]) && trim($_ENV[$name]) != "" ? $_ENV[$name] : $default;
-   }
+    $value = getenv($name); // check system-level env first
+    if ($value !== false && trim($value) !== "") {
+        return $value;
+    }
+    return isset($_ENV[$name]) && trim($_ENV[$name]) != "" ? $_ENV[$name] : $default;
+}
+
 
 }
 ?>
