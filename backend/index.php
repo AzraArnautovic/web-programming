@@ -16,7 +16,7 @@ if (in_array($origin, $allowedOrigins)) {
 header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authentication");
 header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Max-Age: 86400"); // Cache preflight for 24 hours
+header("Access-Control-Max-Age: 86400");
 
 // Handle preflight OPTIONS requests IMMEDIATELY
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -55,20 +55,34 @@ Flight::register('auth_middleware', "AuthMiddleware");
 
 Flight::before('start', function() {
     $url = Flight::request()->url;
-   if(
-       strpos(Flight::request()->url, '/auth/login') === 0 ||
-       strpos(Flight::request()->url, '/auth/register') === 0
-   ) {
-       return TRUE;
-   } else {
-       try {
-           $token = Flight::request()->getHeader("Authentication");
-           if(Flight::auth_middleware()->verifyToken($token))
-               return TRUE;
-       } catch (\Exception $e) {
-           Flight::halt(401, $e->getMessage());
-       }
-   }
+    
+    // Normalize URL - remove double slashes and trim
+    $url = '/' . trim(preg_replace('#/+#', '/', $url), '/');
+    
+    // Log for debugging (remove after fixing)
+    error_log("Normalized URL: " . $url);
+    
+    // Check if it's a public auth endpoint
+    if(
+        strpos($url, '/auth/login') === 0 ||
+        strpos($url, '/auth/register') === 0
+    ) {
+        error_log("Public endpoint - skipping auth check");
+        return TRUE;
+    } else {
+        error_log("Protected endpoint - checking auth");
+        try {
+            $token = Flight::request()->getHeader("Authentication");
+            if(!$token) {
+                throw new Exception("Authentication header missing");
+            }
+            if(Flight::auth_middleware()->verifyToken($token))
+                return TRUE;
+        } catch (\Exception $e) {
+            error_log("Auth error: " . $e->getMessage());
+            Flight::halt(401, $e->getMessage());
+        }
+    }
 });
 
 require_once __DIR__ . '/rest/routes/UsersRoutes.php';
