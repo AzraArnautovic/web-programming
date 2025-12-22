@@ -8,27 +8,30 @@ error_reporting(E_ALL ^ (E_NOTICE | E_DEPRECATED));
 class Config {
     public static function DB_NAME()
    {
-       return 'bosnia_rentals'; 
+       return Config::get_env("DB_NAME","bosnia_rentals"); 
    }
    public static function DB_PORT()
    {
-       return  3306;
+       return  Config::get_env("DB_PORT",3306);
    }
    public static function DB_USER()
    {
-       return 'root';
+       return Config::get_env("DB_USER","root");
    }
    public static function DB_PASSWORD()
    {
-       return '06062004Azra';
+       return  Config::get_env("DB_PASSWORD", '');
    }
    public static function DB_HOST()
    {
-       return 'localhost';
+       return Config::get_env("DB_HOST",'localhost');
    }
 
    public static function JWT_SECRET() {
-       return 'lalapopsik';
+       return Config::get_env("JWT_SECRET",'lalapopsik');
+   }
+public static function get_env($name, $default){
+       return isset($_ENV[$name]) && trim($_ENV[$name]) != "" ? $_ENV[$name] : $default;
    }
 
 }
