@@ -24,6 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+require_once __DIR__ . '/rest/config.php';
+
 // NOW load everything else
 require 'vendor/autoload.php';
 require_once __DIR__ . '/rest/services/UsersService.php';
