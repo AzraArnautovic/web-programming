@@ -10,18 +10,30 @@ require_once __DIR__ .  '/middleware/AuthMiddleware.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-// Add CORS headers
-Flight::before('start', function() {
-    header("Access-Control-Allow-Origin: https://shark-app-ioj5q.ondigitalocean.app"); 
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, Authentication");
-    header("Access-Control-Allow-Credentials: true");
+if ($_SERVER['REQUEST_URI'] === '/' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    http_response_code(200);
+    header('Content-Type: application/json');
+    echo json_encode(['status' => 'healthy', 'service' => 'VoteEZ Backend']);
+    exit;
+}
 
-    // Handle preflight OPTIONS requests
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        Flight::halt(200, ''); // short‑circuit the request
-    }
-});
+// Dynamic CORS headers
+$allowedOrigins = [
+    "http://127.0.0.1",
+    "https://shark-app-ioj5q.ondigitalocean.app/",
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
+} 
+
+header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authentication");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(204);
+    exit();
+} 
 
 
 // ini_set('display_errors', 1);
