@@ -872,6 +872,7 @@ loadUserCalendar: function (userId) {
 },
 
   login: function (entity) {
+    console.log("Sending login request...");
     $.ajax({
       url: Constants.PROJECT_BASE_URL + "/auth/login",
       type: "POST",
@@ -879,21 +880,39 @@ loadUserCalendar: function (userId) {
       contentType: "application/json",
       dataType: "json",
       success: function (result) {
+        console.log("Login success response:", result);
+        
+        // Check if result.data exists
+        if (!result.data || !result.data.token) {
+          console.error("No token in response:", result);
+          toastr.error("Login failed - no token received");
+          return;
+        }
+        
         localStorage.setItem("user_token", result.data.token);
+        console.log("Token saved:", result.data.token);
+        
         const decoded = Utils.parseJwt(result.data.token);
+        console.log("Decoded token:", decoded);
+        
         const user = decoded.user;
         localStorage.setItem("user", JSON.stringify(user));
+        console.log("User role:", user?.role);
 
-        if (user?.role === "landlord" || user?.role === Constants.ADMIN_ROLE) {
+        if (user?.role === "landlord" || user?.role === Constants.LANDLORD_ROLE) {
+          console.log("Redirecting to landlord dashboard");
           window.location.replace("index.html#dashboard_landlord");
-        } else if (user?.role === Constants.USER_ROLE) {
+        } else if (user?.role === Constants.USER_ROLE || user?.role === "user") {
+          console.log("Redirecting to user dashboard");
           window.location.replace("index.html#dashboard_user");
         } else {
+          console.log("Unknown role, redirecting to home");
           window.location.replace("index.html#home");
         }
       },
       error: function (xhr) {
-        toastr.error(xhr?.responseText || "Login failed");
+        console.error("Login error:", xhr);
+        toastr.error(xhr?.responseJSON?.message || xhr?.responseText || "Login failed");
       }
     });
   },

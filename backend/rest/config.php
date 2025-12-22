@@ -12,7 +12,7 @@ class Config {
    }
    public static function DB_PORT()
    {
-       return  Config::get_env("DB_PORT",3306);
+       return  Config::get_env("DB_PORT",25060);
    }
    public static function DB_USER()
    {
