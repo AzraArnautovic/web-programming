@@ -20,20 +20,23 @@ if ($_SERVER['REQUEST_URI'] === '/' && $_SERVER['REQUEST_METHOD'] === 'GET') {
 // Dynamic CORS headers
 $allowedOrigins = [
     "http://127.0.0.1",
-    "https://shark-app-ioj5q.ondigitalocean.app/",
+    "https://shark-app-ioj5q.ondigitalocean.app", // no trailing slash
 ];
 
 if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowedOrigins)) {
     header("Access-Control-Allow-Origin: " . $_SERVER['HTTP_ORIGIN']);
-} 
+}
 
 header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authentication");
+header("Access-Control-Allow-Credentials: true"); 
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+// Handle preflight OPTIONS requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit();
-} 
+}
+
 
 
 // ini_set('display_errors', 1);
