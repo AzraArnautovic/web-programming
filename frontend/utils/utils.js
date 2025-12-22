@@ -15,12 +15,15 @@ let Utils = {
      parseJwt: function(token) {
        if (!token) return null;
        try {
-         const payload = token.split('.')[1];
-         const decoded = atob(payload); //Decodes payload from Base64 into plain text
-         return JSON.parse(decoded); //from plain text to json object...to extract user info from token
-       } catch (e) {
-         console.error("Invalid JWT token", e);
-         return null;
-       }
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch(e) {
+      console.error("Error parsing JWT:", e);
+      return null;
+    }
      }  
 }
